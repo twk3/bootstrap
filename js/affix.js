@@ -1,5 +1,5 @@
 /* ========================================================================
- * Bootstrap: affix.js v3.1.1
+ * Bootstrap: affix.js v3.2.0
  * http://getbootstrap.com/javascript/#affix
  * ========================================================================
  * Copyright 2011-2014 Twitter, Inc.
@@ -15,7 +15,8 @@
 
   var Affix = function (element, options) {
     this.options = $.extend({}, Affix.DEFAULTS, options)
-    this.$window = $(window)
+
+    this.$target = $(this.options.target)
       .on('scroll.bs.affix.data-api', $.proxy(this.checkPosition, this))
       .on('click.bs.affix.data-api',  $.proxy(this.checkPositionWithEventLoop, this))
 
@@ -27,18 +28,19 @@
     this.checkPosition()
   }
 
-  Affix.VERSION  = '3.1.1'
+  Affix.VERSION  = '3.2.0'
 
   Affix.RESET    = 'affix affix-top affix-bottom'
 
   Affix.DEFAULTS = {
-    offset: 0
+    offset: 0,
+    target: window
   }
 
   Affix.prototype.getPinnedOffset = function () {
     if (this.pinnedOffset) return this.pinnedOffset
     this.$element.removeClass(Affix.RESET).addClass('affix')
-    var scrollTop = this.$window.scrollTop()
+    var scrollTop = this.$target.scrollTop()
     var position  = this.$element.offset()
     return (this.pinnedOffset = position.top - scrollTop)
   }
@@ -51,7 +53,7 @@
     if (!this.$element.is(':visible')) return
 
     var scrollHeight = $(document).height()
-    var scrollTop    = this.$window.scrollTop()
+    var scrollTop    = this.$target.scrollTop()
     var position     = this.$element.offset()
     var offset       = this.options.offset
     var offsetTop    = offset.top
@@ -81,10 +83,12 @@
     this.$element
       .removeClass(Affix.RESET)
       .addClass(affixType)
-      .trigger($.Event(affixType.replace('affix', 'affixed')))
+      .trigger(affixType.replace('affix', 'affixed') + '.bs.affix')
 
     if (affix == 'bottom') {
-      this.$element.offset({ top: scrollHeight - this.$element.height() - offsetBottom })
+      this.$element.offset({
+        top: scrollHeight - this.$element.height() - offsetBottom
+      })
     }
   }
 
